@@ -1,0 +1,225 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+
+using namespace std;
+
+enum COMANDA {ONLINE, TELEFONIC};
+
+class Ingredient
+{
+    string denumire;
+    int cantitate;
+    int pretUnitar;
+public:
+    Ingredient();
+    void setDenumire(string denumire)
+    {
+        this->denumire = denumire;
+    }
+    void setCantitate(int cantitate)
+    {
+        this->cantitate = cantitate;
+    }
+    void setPretUnitar(int pretUnitar)
+    {
+        this->pretUnitar = pretUnitar;
+    }
+    string getDenumire()
+    {
+        return denumire;
+    }
+    int getCantitate()
+    {
+        return cantitate;
+    }
+    int getPretUnitar()
+    {
+        return pretUnitar;
+    }
+    void operator =(Ingredient const &I)
+    {
+        cantitate= I.cantitate;
+        denumire= I.denumire;
+        pretUnitar= I.pretUnitar;
+    }
+    ~Ingredient();
+};
+
+Ingredient::Ingredient()
+{
+    denumire = "";
+    cantitate = 0;
+    pretUnitar = 0;
+}
+
+Ingredient::~Ingredient()
+{
+    denumire = "";
+    cantitate = 0;
+    pretUnitar = 0;
+}
+
+///--------------------------------------------------------------------------------
+
+class CalculPret
+{
+public:
+    virtual double calculPret(int idPizza) = 0;
+};
+
+///--------------------------------------------------------------------------------
+
+class Pizza: public CalculPret
+{
+    COMANDA comanda;
+    int idPizza=0;
+    int manopera = 15;
+    int numarIngrediente;
+    int distanta;
+    unordered_map<int,vector<Ingredient>> umap;
+
+public:
+    Pizza();
+    double calculPret(int idPizza);
+    friend istream& operator >> (istream& in, Pizza& P);
+    friend ostream& operator<< (ostream& out, Pizza& P);
+    ~Pizza();
+};
+
+Pizza::Pizza()
+{
+    idPizza++;
+    numarIngrediente=0;
+}
+
+istream& operator >> (istream& in, Pizza& P)
+{
+    int i, command;
+    cout<<"\nTipul comenzii (1-ONLINE/0-TELEFONIC): ";
+    in>>command;
+    if(command==1)
+    {
+        P.comanda = ONLINE;
+        cout<<"\nDisanta care trebuie parcursa: ";
+        in>>P.distanta;
+        cout<<"\nNumarul de ingrediente: ";
+        in>>P.numarIngrediente;
+        for(i=0; i<P.numarIngrediente; i++)
+        {
+            string denumire;
+            int cantitate, pretUnitar;
+            Ingredient x;
+            cout<<"\nDenumirea: ";
+            in>>denumire;
+            cout<<"Cantitatea (grame): ";
+            in>>cantitate;
+            cout<<"Pretul: ";
+            in>>pretUnitar;
+            x.setCantitate(cantitate);
+            x.setDenumire(denumire);
+            x.setPretUnitar(pretUnitar);
+            P.umap[P.idPizza].push_back(x);
+        }
+    }
+    else
+    {
+        P.comanda = TELEFONIC;
+        cout<<"\nNumarul de ingrediente: ";
+        in>>P.numarIngrediente;
+        for(i=0; i<P.numarIngrediente; i++)
+        {
+            string denumire;
+            int cantitate, pretUnitar;
+            Ingredient x;
+            cout<<"\nDenumirea: ";
+            in>>denumire;
+            cout<<"Cantitatea (grame): ";
+            in>>cantitate;
+            cout<<"Pretul: ";
+            in>>pretUnitar;
+            x.setCantitate(cantitate);
+            x.setDenumire(denumire);
+            x.setPretUnitar(pretUnitar);
+            P.umap[P.idPizza].push_back(x);
+        }
+    }
+    return in;
+}
+
+
+ostream& operator<< (ostream& out, Pizza& P)
+{
+    int ct=0;
+    out<<"\nID-ul: "<<P.idPizza;
+    out<<"\nNumarul de ingrediente: "<<P.numarIngrediente;
+    out<<"\n";
+    for(Ingredient I: P.umap[P.idPizza])
+    {
+        ct++;
+        out<<"\nIngredientul numarul "<<ct;
+        out<<"\nDenumirea: "<<I.getDenumire();
+        out<<"\nCantitatea: "<<I.getCantitate();
+        out<<"\nPretul unitar: "<<I.getPretUnitar();
+        out<<"\n";
+    }
+    return out;
+}
+
+
+double Pizza::calculPret(int idPizza)
+{
+    double pret=0;
+    if(comanda==TELEFONIC)
+    {
+        for(Ingredient I: umap[idPizza])
+            pret += I.getPretUnitar();
+        pret += manopera;
+    }
+    if(comanda==ONLINE)
+    {
+        for(Ingredient I: umap[idPizza])
+            pret += I.getPretUnitar();
+        pret += manopera;
+        pret += (double)((distanta/10)*pret*5/100);
+    }
+    return pret;
+}
+
+Pizza::~Pizza()
+{
+    numarIngrediente= 0;
+}
+
+int main()
+{
+    /*
+    Ingredient x, y;
+    x.setCantitate(24);
+    x.setDenumire("yolo");
+    x.setPretUnitar(11);
+    y=x;
+    unordered_map <int,vector<Ingredient>> u;
+    u[1].push_back(x);
+    u[2].push_back(y);
+    for(int j=1;j<=2;j++)
+        for(Ingredient I: u[j])
+            cout<<I.getCantitate();
+    */
+
+    Pizza P[3];
+    for(int i=0;i<2;i++)
+    {
+        cin>>P[i];
+    }
+    for(int i=0;i<2;i++)
+    {
+        cout<<P[i];
+    }
+    /*
+    Pizza P;
+    cin>>P;
+    cout<<P;
+    cout<<P.calculPret(1);
+    */
+    return 0;
+}
