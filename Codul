@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <unordered_map>
+#include <string>
 
 using namespace std;
 
@@ -72,24 +73,26 @@ public:
 class Pizza: public CalculPret
 {
     COMANDA comanda;
-    int idPizza=0;
+    string idPizza;
+    static int nrOrd;
     int manopera = 15;
     int numarIngrediente;
     int distanta;
     unordered_map<int,vector<Ingredient>> umap;
 
 public:
-    Pizza();
+
+    Pizza(int = 0);
     double calculPret(int idPizza);
     friend istream& operator >> (istream& in, Pizza& P);
     friend ostream& operator<< (ostream& out, Pizza& P);
     ~Pizza();
 };
 
-Pizza::Pizza()
+Pizza::Pizza(int n): numarIngrediente(n)
 {
-    idPizza++;
-    numarIngrediente=0;
+    nrOrd++;
+    this->idPizza = "PizzeriaX-" + to_string(nrOrd);
 }
 
 istream& operator >> (istream& in, Pizza& P)
@@ -184,6 +187,8 @@ double Pizza::calculPret(int idPizza)
     }
     return pret;
 }
+
+int Pizza::nrOrd = 0;
 
 Pizza::~Pizza()
 {
