@@ -225,9 +225,9 @@ istream& operator >> (istream& in, Pizza& P)
 ostream& operator<< (ostream& out, Pizza& P)
 {
     int ct=0;
-    out<<"\nID Pizza: "<<P.idPizza;
+    out<<"\nComanda cu ID-ul: "<<P.idPizza;
     if(P.comanda==ONLINE)
-        out<<"\nComanda este facuta in mediul online";
+        out<<"\nComanda este facuta in mediul online"<<"\nDistanta parcursa este de "<<P.distanta<<" km";
     else
     {
         P.C.pizza = NONVEGETARIANA;
@@ -308,43 +308,16 @@ Pizza::~Pizza()
 
 int main()
 {
-    /*
-    Ingredient x, y;
-    x.setCantitate(24);
-    x.setDenumire("yolo");
-    x.setPretUnitar(11);
-    y=x;
-    unordered_map <int,vector<Ingredient>> u;
-    u[1].push_back(x);
-    u[2].push_back(y);
-    for(int j=1;j<=2;j++)
-        for(Ingredient I: u[j])
-            cout<<I.getCantitate();
-    */
-    /*
-    Pizza P[3];
-    for(int i=0;i<2;i++)
-    {
-        cin>>P[i];
-    }
-    for(int i=0;i<2;i++)
-    {
-        cout<<P[i];
-    }
-    */
-    /*
-    Pizza P;
-    cin>>P;
-    cout<<P;
-    cout<<P.calculPret(1);
-    */
     int i;
-    vector <Pizza*> p;
-    Pizza a1,a2,a3;
-    cin>>a1>>a2;
-    p.push_back(&a1);
-    p.push_back(&a2);
+    vector <Pizza> p;
+    for(int i=1;i<=2;i++)
+    {
+        Pizza P;
+        cin>>P;
+        p.push_back(P);
+    }
+
     for(auto ir=p.begin(); ir!=p.end(); ir++)
-        cout<<(*(*ir));
+        cout<<(*ir);
     return 0;
 }
