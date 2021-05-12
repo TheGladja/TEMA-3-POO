@@ -70,29 +70,88 @@ public:
 
 ///--------------------------------------------------------------------------------
 
-class Pizza: public CalculPret
+class Meniu
 {
-    COMANDA comanda;
-    string idPizza;
+protected:
+    unordered_map<int,vector<Ingredient>> umap;
+    int idPizza;
     static int nrOrd;
+    bool tipPizza;
+
+public:
+    Meniu();
+    ~Meniu();
+};
+
+Meniu::Meniu()
+{
+    idPizza = 0;
+    nrOrd++;
+    idPizza = nrOrd;
+}
+
+Meniu::~Meniu()
+{
+    idPizza = 0;
+}
+
+int Meniu::nrOrd = 0;
+
+///----------------------------------------------------------------------------------
+
+class Comanda_Online: public Meniu
+{
+protected:
+    int optiune;
+
+public:
+    Comanda_Online(): Meniu()
+    {};
+    friend istream& operator>> (istream& in, Comanda_Online& C);
+    friend ostream& operator<< (ostream& out, const Comanda_Online& C);
+};
+
+istream& operator>> (istream& in, Comanda_Online& C)
+{
+    cout<<"\nIntroduceti numarul produsului dorit: ";
+    in>>C.optiune;
+    return in;
+}
+
+ostream& operator<< (ostream& out, const Comanda_Online& C)
+{
+    out<<"\nPentru pizza vegetariana aveti urmatoarele optiuni:";
+    out<<"\n1.Pizza Margherita- 20 de lei";
+    out<<"\n2.Pizza Marinara- 23 de lei";
+    out<<"\n3.Pizza Quattro Formaggi- 18 lei";
+    out<<"\n4.Pizza Ortolana- 19 lei";
+    out<<"\n5.Pizza Frutti di Mare- 24 de lei";
+    return out;
+}
+
+///----------------------------------------------------------------------------------
+
+class Pizza: public CalculPret, public Comanda_Online
+{
+protected:
+    COMANDA comanda;
     int manopera = 15;
     int numarIngrediente;
     int distanta;
-    unordered_map<int,vector<Ingredient>> umap;
+    Comanda_Online C;
 
 public:
 
-    Pizza(int = 0);
+    Pizza();
     double calculPret(int idPizza);
     friend istream& operator >> (istream& in, Pizza& P);
     friend ostream& operator<< (ostream& out, Pizza& P);
     ~Pizza();
 };
 
-Pizza::Pizza(int n): numarIngrediente(n)
+Pizza::Pizza(): Comanda_Online()
 {
-    nrOrd++;
-    this->idPizza = "PizzeriaX-" + to_string(nrOrd);
+    numarIngrediente = 0;
 }
 
 istream& operator >> (istream& in, Pizza& P)
@@ -105,23 +164,34 @@ istream& operator >> (istream& in, Pizza& P)
         P.comanda = ONLINE;
         cout<<"\nDisanta care trebuie parcursa: ";
         in>>P.distanta;
-        cout<<"\nNumarul de ingrediente: ";
-        in>>P.numarIngrediente;
-        for(i=0; i<P.numarIngrediente; i++)
+        cout<<"\nTipul pizzei (1 - vegetariana/ 0 - nonvegetariana): ";
+        in>>P.tipPizza;
+        if(!P.tipPizza)
         {
-            string denumire;
-            int cantitate, pretUnitar;
-            Ingredient x;
-            cout<<"\nDenumirea: ";
-            in>>denumire;
-            cout<<"Cantitatea (grame): ";
-            in>>cantitate;
-            cout<<"Pretul: ";
-            in>>pretUnitar;
-            x.setCantitate(cantitate);
-            x.setDenumire(denumire);
-            x.setPretUnitar(pretUnitar);
-            P.umap[P.idPizza].push_back(x);
+            cout<<"\nNumarul de ingrediente: ";
+            in>>P.numarIngrediente;
+            for(i=0; i<P.numarIngrediente; i++)
+            {
+                string denumire;
+                int cantitate, pretUnitar;
+                Ingredient x;
+                cout<<"\nDenumirea: ";
+                in>>denumire;
+                cout<<"Cantitatea (grame): ";
+                in>>cantitate;
+                cout<<"Pretul: ";
+                in>>pretUnitar;
+                x.setCantitate(cantitate);
+                x.setDenumire(denumire);
+                x.setPretUnitar(pretUnitar);
+                P.umap[P.idPizza].push_back(x);
+            }
+        }
+        else
+        {
+            cout<<P.C;
+            cout<<"\n";
+            cin>>P.C;
         }
     }
     else
@@ -153,13 +223,13 @@ istream& operator >> (istream& in, Pizza& P)
 ostream& operator<< (ostream& out, Pizza& P)
 {
     int ct=0;
-    out<<"\nID-ul: "<<P.idPizza;
+    out<<"\nID Pizza: "<<P.idPizza;
     out<<"\nNumarul de ingrediente: "<<P.numarIngrediente;
     out<<"\n";
     for(Ingredient I: P.umap[P.idPizza])
     {
         ct++;
-        out<<"\nIngredientul numarul "<<ct;
+        out<<"\nIngredientul numarul: "<<ct;
         out<<"\nDenumirea: "<<I.getDenumire();
         out<<"\nCantitatea: "<<I.getCantitate();
         out<<"\nPretul unitar: "<<I.getPretUnitar();
@@ -188,11 +258,10 @@ double Pizza::calculPret(int idPizza)
     return pret;
 }
 
-int Pizza::nrOrd = 0;
-
 Pizza::~Pizza()
 {
     numarIngrediente= 0;
+    idPizza = 0;
 }
 
 int main()
@@ -210,7 +279,7 @@ int main()
         for(Ingredient I: u[j])
             cout<<I.getCantitate();
     */
-
+    /*
     Pizza P[3];
     for(int i=0;i<2;i++)
     {
@@ -220,11 +289,20 @@ int main()
     {
         cout<<P[i];
     }
+    */
     /*
     Pizza P;
     cin>>P;
     cout<<P;
     cout<<P.calculPret(1);
     */
+    int i;
+    vector <Pizza*> p;
+    Pizza a1,a2;
+    cin>>a1>>a2;
+    p.push_back(&a1);
+    p.push_back(&a2);
+    for(auto ir=p.begin(); ir!=p.end(); ir++)
+        cout<<(*(*ir));
     return 0;
 }
