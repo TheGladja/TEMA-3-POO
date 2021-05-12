@@ -4,7 +4,8 @@
 
 using namespace std;
 
-enum COMANDA {ONLINE, TELEFONIC};
+enum COMANDA {ONLINE, FIZIC};
+enum PIZZA {VEGETARIANA, NONVEGETARIANA};
 
 class Ingredient
 {
@@ -79,16 +80,10 @@ protected:
     bool tipPizza;
 
 public:
-    Meniu();
+    Meniu()
+    {};
     ~Meniu();
 };
-
-Meniu::Meniu()
-{
-    idPizza = 0;
-    nrOrd++;
-    idPizza = nrOrd;
-}
 
 Meniu::~Meniu()
 {
@@ -101,8 +96,9 @@ int Meniu::nrOrd = 0;
 
 class Comanda_Online: public Meniu
 {
-protected:
+public:
     int optiune;
+    PIZZA pizza;
 
 public:
     Comanda_Online(): Meniu()
@@ -152,20 +148,26 @@ public:
 Pizza::Pizza(): Comanda_Online()
 {
     numarIngrediente = 0;
+    nrOrd++;
+    idPizza = nrOrd;
 }
 
 istream& operator >> (istream& in, Pizza& P)
 {
     int i, command;
-    cout<<"\nTipul comenzii (1-ONLINE/0-TELEFONIC): ";
+    cout<<"\nTipul comenzii (1-ONLINE/0-FIZIC): ";
     in>>command;
     if(command==1)
     {
         P.comanda = ONLINE;
-        cout<<"\nDisanta care trebuie parcursa: ";
+        cout<<"\nDistanta care trebuie parcursa: ";
         in>>P.distanta;
-        cout<<"\nTipul pizzei (1 - vegetariana/ 0 - nonvegetariana): ";
+        cout<<"\nTipul pizzei (1-vegetariana/0-nonvegetariana): ";
         in>>P.tipPizza;
+        if(P.tipPizza)
+            P.C.pizza = VEGETARIANA;
+        else
+            P.C.pizza = NONVEGETARIANA;
         if(!P.tipPizza)
         {
             cout<<"\nNumarul de ingrediente: ";
@@ -196,7 +198,7 @@ istream& operator >> (istream& in, Pizza& P)
     }
     else
     {
-        P.comanda = TELEFONIC;
+        P.comanda = FIZIC;
         cout<<"\nNumarul de ingrediente: ";
         in>>P.numarIngrediente;
         for(i=0; i<P.numarIngrediente; i++)
@@ -224,17 +226,41 @@ ostream& operator<< (ostream& out, Pizza& P)
 {
     int ct=0;
     out<<"\nID Pizza: "<<P.idPizza;
-    out<<"\nNumarul de ingrediente: "<<P.numarIngrediente;
-    out<<"\n";
-    for(Ingredient I: P.umap[P.idPizza])
+    if(P.comanda==ONLINE)
+        out<<"\nComanda este facuta in mediul online";
+    else
     {
-        ct++;
-        out<<"\nIngredientul numarul: "<<ct;
-        out<<"\nDenumirea: "<<I.getDenumire();
-        out<<"\nCantitatea: "<<I.getCantitate();
-        out<<"\nPretul unitar: "<<I.getPretUnitar();
-        out<<"\n";
+        P.C.pizza = NONVEGETARIANA;
+        out<<"\nComanda este facuta fizic";
     }
+    if(P.C.pizza==NONVEGETARIANA)
+    {
+        out<<"\nNumarul de ingrediente: "<<P.numarIngrediente;
+        out<<"\n";
+        for(Ingredient I: P.umap[P.idPizza])
+        {
+            ct++;
+            out<<"\nIngredientul numarul: "<<ct;
+            out<<"\nDenumirea: "<<I.getDenumire();
+            out<<"\nCantitatea: "<<I.getCantitate();
+            out<<"\nPretul unitar: "<<I.getPretUnitar();
+            out<<"\n";
+        }
+    }
+    else
+    {
+        if(P.C.optiune==1)
+            out<<"\nAti comandat o Pizza Margherita\n";
+        else if(P.C.optiune==2)
+            out<<"\nAti comandat o Pizza Marinara\n";
+        else if(P.C.optiune==3)
+            out<<"\nAti comandat o Quattro Formaggi\n";
+        else if(P.C.optiune==4)
+            out<<"\nAti comandat o Ortolana\n";
+        else
+            out<<"\nAti comandat o Frutti di Mare\n";
+    }
+    out<<"\nPretul este: "<<P.calculPret(P.idPizza)<<" lei\n";
     return out;
 }
 
@@ -242,17 +268,33 @@ ostream& operator<< (ostream& out, Pizza& P)
 double Pizza::calculPret(int idPizza)
 {
     double pret=0;
-    if(comanda==TELEFONIC)
+    if(comanda==FIZIC)
     {
         for(Ingredient I: umap[idPizza])
             pret += I.getPretUnitar();
         pret += manopera;
     }
-    if(comanda==ONLINE)
+    else
     {
-        for(Ingredient I: umap[idPizza])
-            pret += I.getPretUnitar();
-        pret += manopera;
+        if(C.pizza==NONVEGETARIANA)
+        {
+            for(Ingredient I: umap[idPizza])
+                pret += I.getPretUnitar();
+            pret += manopera;
+        }
+        else
+        {
+            if(C.optiune==1)
+                pret = 20;
+            else if(C.optiune==2)
+                pret = 23;
+            else if(C.optiune==3)
+                pret = 18;
+            else if(C.optiune==4)
+                pret = 19;
+            else
+                pret = 24;
+        }
         pret += (double)((distanta/10)*pret*5/100);
     }
     return pret;
@@ -298,7 +340,7 @@ int main()
     */
     int i;
     vector <Pizza*> p;
-    Pizza a1,a2;
+    Pizza a1,a2,a3;
     cin>>a1>>a2;
     p.push_back(&a1);
     p.push_back(&a2);
