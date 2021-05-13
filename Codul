@@ -381,8 +381,8 @@ int main()
             {
                 if(x==3)
                     cout<<"\nNu exista comanda cu numarul "<<id;
-                    cout<<"\nTrebuie sa introduceti un numar din intervalul [1, "<<p.size()<<"] :";
-                    cin>>id;
+                cout<<"\nTrebuie sa introduceti un numar din intervalul [1, "<<p.size()<<"] :";
+                cin>>id;
             }
             id--;
             cout<<p[id];
