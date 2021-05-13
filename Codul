@@ -78,10 +78,14 @@ protected:
     bool tipPizza;
 
 public:
-    Meniu()
-    {};
+    Meniu();
     ~Meniu();
 };
+
+Meniu::Meniu()
+{
+    idPizza = 0;
+}
 
 Meniu::~Meniu()
 {
@@ -109,6 +113,21 @@ istream& operator>> (istream& in, Comanda_Online& C)
 {
     cout<<"\nIntroduceti numarul produsului dorit: ";
     in>>C.optiune;
+    try
+    {
+        if(C.optiune>5)
+            throw 4;
+    }
+    catch(int x)
+    {
+        if(x==4)
+        {
+            cout<<"\nNu exista pizza cu numarul "<<C.optiune;
+            cout<<"\nIntroduceti un numar dintre urmatoarele: 1, 2, 3, 4, 5";
+            cout<<"\nIntroduceti optiunea din nou: ";
+            in>>C.optiune;
+        }
+    }
     return in;
 }
 
@@ -179,7 +198,7 @@ istream& operator >> (istream& in, Pizza& P)
                 in>>denumire;
                 cout<<"Cantitatea (grame): ";
                 in>>cantitate;
-                cout<<"Pretul: ";
+                cout<<"Pretul (lei): ";
                 in>>pretUnitar;
                 x.setCantitate(cantitate);
                 x.setDenumire(denumire);
@@ -208,7 +227,7 @@ istream& operator >> (istream& in, Pizza& P)
             in>>denumire;
             cout<<"Cantitatea (grame): ";
             in>>cantitate;
-            cout<<"Pretul: ";
+            cout<<"Pretul (lei): ";
             in>>pretUnitar;
             x.setCantitate(cantitate);
             x.setDenumire(denumire);
@@ -241,7 +260,7 @@ ostream& operator<< (ostream& out, Pizza& P)
             out<<"\nIngredientul numarul: "<<ct;
             out<<"\nDenumirea: "<<I.getDenumire();
             out<<"\nCantitatea: "<<I.getCantitate();
-            out<<"\nPretul unitar: "<<I.getPretUnitar();
+            out<<"\nPretul unitar: "<<I.getPretUnitar()<<" lei";
             out<<"\n";
         }
     }
@@ -308,38 +327,76 @@ int main()
 {
     int i, task;
     vector <Pizza> p;
-    do{
+    do
+    {
         cout<<"\nNumarul de comenzi: "<<p.size();
         cout<<"\nApasati tasta 1 pentru a adauga o comanda";
         cout<<"\nApasati tasta 2 pentru a vizualiza o comanda";
-        cout<<"\nApasati tasta 3 pentru a vizualiza toate comenzile\n";
+        cout<<"\nApasati tasta 3 pentru a vizualiza toate comenzile";
+        cout<<"\nApasati tasta 4 pentru a inchide programul\n";
         cin>>task;
-
+        try
+        {
+            if(task!=1 && task!=2 && task!=3 && task!=4)
+                throw 1;
+            if(p.size()==0 && (task==2 || task==3))
+                throw 2;
+        }
+        catch(int x)
+        {
+            if(x==1)
+            {
+                cout<<"\nTrebuie sa introduceti un numar dintre urmatoarele: 1, 2, 3, 4;";
+                cout<<"\nIntroduceti optiunea din nou: ";
+                cin>>task;
+            }
+            else if(x==2)
+            {
+                cout<<"\nLista comenzilor este goala";
+                cout<<"\nTrebuie sa apasati tasta 1 pentru a introduce o comanda";
+                cout<<"\nIntroduceti optiunea din nou: ";
+                cin>>task;
+            }
+        }
         switch(task)
         {
         case 1:
-            {
-                Pizza P;
-                cin>>P;
-                p.push_back(P);
-                break;
-            }
-            case 2:
-            {
-                int id;
-                cout<<"\nIntroduceti numarul comenzii pe care doriti sa o vizualizati: ";
-                cin>>id;
-                id--;
-                cout<<p[id];
-                break;
-            }
-            case 3:
-            {
-                for(auto ir=p.begin(); ir!=p.end(); ir++)
-                    cout<<(*ir);
-                break;
-            }
+        {
+            Pizza P;
+            cin>>P;
+            p.push_back(P);
+            break;
         }
-    }while(task==1 || task==2 || task==3);
+        case 2:
+        {
+            int id;
+            cout<<"\nIntroduceti numarul comenzii pe care doriti sa o vizualizati: ";
+            cin>>id;
+            try
+            {
+                if(id>p.size())
+                    throw 3;
+            }
+            catch(int x)
+            {
+                if(x==3)
+                    cout<<"\nNu exista comanda cu numarul "<<id;
+                    cout<<"\nTrebuie sa introduceti un numar din intervalul [1, "<<p.size()<<"] :";
+                    cin>>id;
+            }
+            id--;
+            cout<<p[id];
+            break;
+        }
+        case 3:
+        {
+            for(auto ir=p.begin(); ir!=p.end(); ir++)
+                cout<<(*ir);
+            break;
+        }
+        }
+    }
+    while(task==1 || task==2 || task==3);
+    cout<<"\nProgramul a fost inchis cu succes\n";
     return 0;
 }
