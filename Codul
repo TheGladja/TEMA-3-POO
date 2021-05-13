@@ -1,6 +1,4 @@
 #include <bits/stdc++.h>
-#include <unordered_map>
-#include <string>
 
 using namespace std;
 
@@ -260,7 +258,7 @@ ostream& operator<< (ostream& out, Pizza& P)
         else
             out<<"\nAti comandat o Frutti di Mare\n";
     }
-    out<<"\nPretul este: "<<P.calculPret(P.idPizza)<<" lei\n";
+    out<<"\nPretul total este (manopera inclusa): "<<P.calculPret(P.idPizza)<<" lei\n";
     return out;
 }
 
@@ -308,16 +306,40 @@ Pizza::~Pizza()
 
 int main()
 {
-    int i;
+    int i, task;
     vector <Pizza> p;
-    for(int i=1;i<=2;i++)
-    {
-        Pizza P;
-        cin>>P;
-        p.push_back(P);
-    }
+    do{
+        cout<<"\nNumarul de comenzi: "<<p.size();
+        cout<<"\nApasati tasta 1 pentru a adauga o comanda";
+        cout<<"\nApasati tasta 2 pentru a vizualiza o comanda";
+        cout<<"\nApasati tasta 3 pentru a vizualiza toate comenzile\n";
+        cin>>task;
 
-    for(auto ir=p.begin(); ir!=p.end(); ir++)
-        cout<<(*ir);
+        switch(task)
+        {
+        case 1:
+            {
+                Pizza P;
+                cin>>P;
+                p.push_back(P);
+                break;
+            }
+            case 2:
+            {
+                int id;
+                cout<<"\nIntroduceti numarul comenzii pe care doriti sa o vizualizati: ";
+                cin>>id;
+                id--;
+                cout<<p[id];
+                break;
+            }
+            case 3:
+            {
+                for(auto ir=p.begin(); ir!=p.end(); ir++)
+                    cout<<(*ir);
+                break;
+            }
+        }
+    }while(task==1 || task==2 || task==3);
     return 0;
 }
